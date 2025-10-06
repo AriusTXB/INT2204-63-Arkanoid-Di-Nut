@@ -1,4 +1,5 @@
 package standards.view;
 
-public class Updatable {
+public interface Updatable {
+    public abstract void tick();
 }
