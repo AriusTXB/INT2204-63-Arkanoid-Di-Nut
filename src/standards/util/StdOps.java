@@ -92,8 +92,8 @@ public abstract class StdOps {
    * @param max maximum allowable value
    * @return the clamped value
    */
-  public static int clamp(int num, int min, int max) {
-    return Math.max(min, Math.min(num, max));
+  public static double clamp(double num, double min, double max) {
+      return Math.max(min, Math.min(num, max));
   }
 
   /**
