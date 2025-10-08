@@ -64,22 +64,24 @@ public class StandardFadeController {
      */
     public Color combine() {
         // Update interpolation progress based on fade direction
-        if (this.time <= 1.0 && this.firstColor) {
-            this.time += this.ALPHA;
+        if (firstColor) {
+            time += ALPHA;
+            if (time >= 1.0) {
+                time = 1.0;
+                firstColor = false;
+            }
         } else {
-            this.firstColor = false;
-        }
-
-        if (this.time >= 0.0 && !this.firstColor) {
-            this.time -= this.ALPHA;
-        } else {
-            this.firstColor = true;
+            time -= ALPHA;
+            if (time <= 0.0) {
+                time = 0.0;
+                firstColor = true;
+            }
         }
 
         // Interpolate RGB components
-        double r = this.time * COLOR_TWO.getRed() + (1.0 - this.time) * COLOR_ONE.getRed();
-        double g = this.time * COLOR_TWO.getGreen() + (1.0 - this.time) * COLOR_ONE.getGreen();
-        double b = this.time * COLOR_TWO.getBlue() + (1.0 - this.time) * COLOR_ONE.getBlue();
+        double r = (1 - time) * COLOR_ONE.getRed() + time * COLOR_TWO.getRed();
+        double g = (1 - time) * COLOR_ONE.getGreen() + time * COLOR_TWO.getGreen();
+        double b = (1 - time) * COLOR_ONE.getBlue() + time * COLOR_TWO.getBlue();
 
         // Clamp values and return a new color
         return Color.color(
