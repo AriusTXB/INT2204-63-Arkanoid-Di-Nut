@@ -30,6 +30,7 @@ import standards.util.StdOps;
  * @see javafx.scene.canvas.GraphicsContext
  * @see javafx.scene.paint.Color
  * @see javafx.scene.text.Font
+ * Modified from Joshua Crotts & Andrew Matzureff's Standards Java Game Library Source Code
  */
 public abstract class StandardDraw {
 
