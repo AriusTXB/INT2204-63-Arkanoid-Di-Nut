@@ -324,4 +324,6 @@ public abstract class StandardDraw {
   public static final Color PANSY_PURPLE =  Color(120, 24, 74);
   public static final Color DARK_PURPLE =  Color(48, 25, 52);
   public static final Color VIOLET =  Color(127, 0, 255);
+
+  public static final Color BLACK = Color.BLACK;
 }
