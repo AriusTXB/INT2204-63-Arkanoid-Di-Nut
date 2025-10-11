@@ -38,7 +38,7 @@ public class Ball extends StandardGameObject {
      * Constructs a new Ball object at a given position and difficulty level.
      */
     public Ball(double x, double y, int difficulty) {
-        super(x, y, 8, 8);
+        super(x, y, 20, 20);
         this.setId(StandardID.Enemy);
         setFixedVelocity(difficulty);
     }

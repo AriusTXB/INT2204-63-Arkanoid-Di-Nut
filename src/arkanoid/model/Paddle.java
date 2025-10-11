@@ -31,6 +31,10 @@ public class Paddle extends StandardGameObject {
     /** Default paddle color. */
     private final Color normal = StandardDraw.RED;
 
+    /** Paddle movement speed. */
+    private double speed = 8;
+
+
     /** Fade controller for the enlarged paddle effect. */
     private final StandardFadeController largeFade =
             new StandardFadeController(StandardDraw.MELON, StandardDraw.VIOLET, 0.05);
@@ -91,8 +95,8 @@ public class Paddle extends StandardGameObject {
         gc.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
-    public void moveLeft() { this.setVelX(-5); }
-    public void moveRight() { this.setVelX(5); }
+    public void moveLeft() { this.setVelX(-speed); }
+    public void moveRight() { this.setVelX(speed); }
 
     /**
      * Stops the paddle's horizontal movement.

@@ -208,7 +208,33 @@ public class StandardHandler implements Renderable, Updatable {
      * Checks for collisions between entities in the handler.
      */
     public void checkCollisions() {
+        for (int i = 0; i < entities.size(); i++) {
+            StandardGameObject obj1 = entities.get(i);
+
+            // Chỉ xử lý cho Ball
+            if (obj1.getId() == StandardID.Enemy) {
+                for (int j = 0; j < entities.size(); j++) {
+                    StandardGameObject obj2 = entities.get(j);
+                    if (i == j) continue;
+
+                    // Ball chạm Paddle
+                    if (obj2.getId() == StandardID.Player &&
+                            obj1.getBounds().intersects(obj2.getBounds())) {
+                        obj1.setVelY(-Math.abs(obj1.getVelY())); // nảy lên
+                    }
+
+                    // Ball chạm Brick
+                    if (obj2.getId() == StandardID.Brick &&
+                            obj1.getBounds().intersects(obj2.getBounds())) {
+                        obj1.setVelY(-obj1.getVelY()); // nảy lại
+                        removeEntity(obj2); // xóa brick
+                        break;
+                    }
+                }
+            }
+        }
     }
+
 
     /**
      * Returns the number of entities currently managed by this handler.
