@@ -42,9 +42,18 @@ public class GameLogicTest extends StandardGame {
 
         // Gán sự kiện bàn phím
         getWindow().getScene().setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.LEFT) paddle.moveLeft();
-            if (e.getCode() == KeyCode.RIGHT) paddle.moveRight();
-            if (e.getCode() == KeyCode.SPACE && !ballLaunched) ballLaunched = true;
+            if (e.getCode() == KeyCode.LEFT) {
+                paddle.moveLeft();
+            }
+            if (e.getCode() == KeyCode.RIGHT) {
+                paddle.moveRight();
+            }
+            if (e.getCode() == KeyCode.SPACE && !ballLaunched) {
+                ballLaunched = true;
+                double speed = Math.abs(ball.getVelY());
+                ball.setVelX(0);
+                ball.setVelY(-speed);
+            }
         });
 
         getWindow().getScene().setOnKeyReleased(e -> {
