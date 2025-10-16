@@ -20,7 +20,7 @@ public class Paddle extends StandardGameObject {
     private final double LEFT_BORDER = 20;
 
     /** Right boundary offset from screen edge. */
-    private final double RIGHT_BORDER = 30;
+    private final double RIGHT_BORDER = 20;
 
     /** Default paddle width. */
     private final double NORMAL_WIDTH = 100;
@@ -61,7 +61,20 @@ public class Paddle extends StandardGameObject {
      * Updates paddle state every frame.
      */
     public void tick() {
-        // Handle power-up fade and timer
+        this.setX(this.getX() + this.getVelX());
+        this.setY(this.getY() + this.getVelY());
+
+        // Xử lý biên
+        if (this.getX() < LEFT_BORDER) {
+            this.setX(LEFT_BORDER);
+        }
+
+        double rightLimit = sceneWidth - this.getWidth() - RIGHT_BORDER;
+        if (this.getX() > rightLimit) {
+            this.setX(rightLimit);
+        }
+
+        // Xử lý hiệu ứng large
         if (isLarge) {
             largeFade.combine();
             timer--;
@@ -71,17 +84,8 @@ public class Paddle extends StandardGameObject {
                 timer = 500;
             }
         }
-
-        // Boundary constraints
-        if (this.getX() <= LEFT_BORDER)
-            this.setX((int) LEFT_BORDER);
-        if (this.getX() >= sceneWidth - this.getWidth() - RIGHT_BORDER)
-            this.setX((int) (sceneWidth - this.getWidth() - RIGHT_BORDER));
-
-        // Update position
-        this.setX(this.getX() + this.getVelX());
-        this.setY(this.getY() + this.getVelY());
     }
+
 
     /**
      * Renders the paddle on the given graphics context.
