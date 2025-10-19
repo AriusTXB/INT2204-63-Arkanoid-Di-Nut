@@ -1,6 +1,7 @@
 package arkanoid.model;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import standards.main.StandardDraw;
 import standards.controller.StandardFadeController;
 import standards.model.StandardGameObject;
@@ -9,11 +10,8 @@ import standards.util.StdOps;
 
 /**
  * Represents the moving ball in the Arkanoid game.
- *
- * The ball bounces off walls and interacts with the paddle and bricks.
- * Its speed is determined by the current game level,
- * with higher levels increasing the velocity.
- * The ball also features a smooth color fade effect during movement.
+ * The ball's sole responsibility is to move and collide.
+ * Trail creation is handled externally by GameLogicTest for performance.
  */
 public class Ball extends StandardGameObject {
 
@@ -45,9 +43,6 @@ public class Ball extends StandardGameObject {
 
     /**
      * Sets a fixed velocity for the ball based on the current difficulty level.
-     *
-     * The direction is randomized, but the speed magnitude
-     * increases with higher levels.
      */
     private void setFixedVelocity(int difficulty) {
         double speed;
@@ -73,9 +68,7 @@ public class Ball extends StandardGameObject {
     }
 
     /**
-     * Updates the ball’s position and handles wall collisions each frame.
-     * If the ball moves beyond the bottom of the screen, it is marked as "dead"
-     * and will no longer be rendered or updated.
+     * Updates the ball’s position and handles wall collisions.
      */
     public void tick() {
         if (!isAlive) return;
@@ -106,6 +99,13 @@ public class Ball extends StandardGameObject {
         if (!isAlive) return;
         gc.setFill(stdFade.combine());
         gc.fillOval(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    }
+
+    /**
+     * Gets the current color of the ball.
+     */
+    public Color getCurrentColor() {
+        return stdFade.combine();
     }
 
     /**
