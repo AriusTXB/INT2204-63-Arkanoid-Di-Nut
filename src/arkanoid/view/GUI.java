@@ -4,8 +4,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
 
 public class GUI extends Application {
 
@@ -14,9 +15,9 @@ public class GUI extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Create the root Pane
-        Pane root = new Pane();
+        StackPane root = new StackPane();
 
-        // Create the dynamic background
+        // Create the dynamic background (ensure Background class handles the Pane correctly)
         background = new Background(root);
 
         // Load the first background video
@@ -31,18 +32,15 @@ public class GUI extends Application {
 
         // Create Exit button to close the application
         Button exitButton = new Button("Exit");
-        exitButton.setOnAction(e -> System.exit(0));
+        exitButton.setOnAction(e -> primaryStage.close());  // Use close() to gracefully shut down
 
         // Layout the buttons in a vertical stack (VBox)
-        StackPane buttonLayout = new StackPane();
+        VBox buttonLayout = new VBox(10);  // 10px spacing between buttons
         buttonLayout.getChildren().addAll(playButton, exitButton);
+        buttonLayout.setAlignment(Pos.CENTER);  // Center the buttons in the window
 
-        // Set the position of buttons (e.g., centered in the middle of the screen)
-        buttonLayout.setTranslateX(400);  // Horizontal center
-        buttonLayout.setTranslateY(300);  // Vertical center
-
-        // Add buttons and background to the root
-        root.getChildren().add(buttonLayout);
+        // Add the background and buttons to the root
+        root.getChildren().addAll(background, buttonLayout);
 
         // Create the scene and add it to the stage
         Scene scene = new Scene(root, 800, 600);
@@ -52,6 +50,6 @@ public class GUI extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        launch(args);  // Launch the JavaFX application
     }
 }
