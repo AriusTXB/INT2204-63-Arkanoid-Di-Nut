@@ -1,0 +1,28 @@
+# Java & JavaFX
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.ear
+
+# Ignore build output folders
+/out/
+/build/
+/bin/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Others
+*.swp
