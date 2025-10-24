@@ -1,6 +1,7 @@
 package arkanoid.model;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import standards.main.StandardDraw;
 import standards.controller.StandardFadeController;
@@ -22,18 +23,15 @@ public class Paddle extends StandardGameObject {
     /** Right boundary offset from screen edge. */
     private final double RIGHT_BORDER = 20;
 
-    /** Default paddle width. */
+    /** Default paddle width and height. */
     private final double NORMAL_WIDTH = 100;
-
-    /** Default paddle height. */
     private final double NORMAL_HEIGHT = 10;
-
-    /** Default paddle color. */
-    private final Color normal = StandardDraw.RED;
 
     /** Paddle movement speed. */
     private double speed = 8;
 
+    /** Default paddle color (used as fallback if sprite fails). */
+    private final Color normal = StandardDraw.RED;
 
     /** Fade controller for the enlarged paddle effect. */
     private final StandardFadeController largeFade =
@@ -48,6 +46,10 @@ public class Paddle extends StandardGameObject {
     /** Width of the scene to constrain paddle movement. */
     private double sceneWidth = 800;
 
+    /** Sprites for paddle states. */
+    private Image normalSprite;
+    private Image largeSprite;
+
     /**
      * Constructs a new Paddle at the given position.
      */
@@ -55,6 +57,22 @@ public class Paddle extends StandardGameObject {
         super(x, y, StandardID.Player);
         this.setWidth((int) NORMAL_WIDTH);
         this.setHeight((int) NORMAL_HEIGHT);
+
+        loadSprites();
+    }
+
+    /**
+     * Loads paddle sprites from resources.
+     */
+    private void loadSprites() {
+        try {
+            normalSprite = new Image(getClass().getResourceAsStream("/entities/Paddle/paddle.png"));
+            largeSprite = new Image(getClass().getResourceAsStream("/entities/Paddle/paddle_large.png"));
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to load paddle sprites: " + e.getMessage());
+            normalSprite = null;
+            largeSprite = null;
+        }
     }
 
     /**
@@ -86,25 +104,30 @@ public class Paddle extends StandardGameObject {
         }
     }
 
-
     /**
      * Renders the paddle on the given graphics context.
      */
     public void render(GraphicsContext gc) {
-        if (isLarge)
-            gc.setFill(largeFade.combine());
-        else
-            gc.setFill(normal);
-
-        gc.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        if (isLarge) {
+            if (largeSprite != null)
+                gc.drawImage(largeSprite, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            else {
+                gc.setFill(largeFade.combine());
+                gc.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            }
+        } else {
+            if (normalSprite != null)
+                gc.drawImage(normalSprite, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            else {
+                gc.setFill(normal);
+                gc.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            }
+        }
     }
 
+    /** Movement control methods */
     public void moveLeft() { this.setVelX(-speed); }
     public void moveRight() { this.setVelX(speed); }
-
-    /**
-     * Stops the paddle's horizontal movement.
-     */
     public void stop() { this.setVelX(0); }
 
     /**
@@ -118,13 +141,6 @@ public class Paddle extends StandardGameObject {
         }
     }
 
-    /**
-     * Checks whether the paddle is currently enlarged.
-     */
     public boolean isLarge() { return this.isLarge; }
-
-    /**
-     * Sets the width of the game scene to restrict paddle movement.
-     */
     public void setSceneWidth(double sceneWidth) { this.sceneWidth = sceneWidth; }
 }

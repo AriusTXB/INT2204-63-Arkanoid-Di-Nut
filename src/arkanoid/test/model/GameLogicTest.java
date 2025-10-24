@@ -3,6 +3,7 @@ package arkanoid.test.model;
 import arkanoid.model.Ball;
 import arkanoid.model.Brick;
 import arkanoid.model.Paddle;
+import arkanoid.model.SongBox;
 import javafx.application.Application;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -22,10 +23,15 @@ public class GameLogicTest extends StandardGame {
     private Ball ball;
     private int level = 1;
     private boolean ballLaunched = false;
+    private SongBox songBox;
+
+    // Lives system
+    private int lives = 3;
+    private boolean gameOver = false;
 
     // Object Pooling for Trails
     private final List<StandardTrail> trailPool = new ArrayList<>();
-    private static final int TRAIL_POOL_SIZE = 200; // Create 200 trails up front for reuse
+    private static final int TRAIL_POOL_SIZE = 200;
 
     public GameLogicTest(Stage stage) {
         super(800, 600, "Arkanoid Game Logic Test", stage);
@@ -35,15 +41,17 @@ public class GameLogicTest extends StandardGame {
     /** Initializes game logic. */
     private void initGame() {
         handler = new StandardHandler();
+        songBox = new SongBox();
 
         // Create the trail pool
         trailPool.clear();
         for (int i = 0; i < TRAIL_POOL_SIZE; i++) {
             StandardTrail trail = new StandardTrail(handler);
             trailPool.add(trail);
-            handler.addEntity(trail); // Add them to the handler ONCE at the start
+            handler.addEntity(trail);
         }
 
+        // Create paddle and ball
         paddle = new Paddle(getGameWidth() / 2.0 - 50, getGameHeight() - 40);
         paddle.setSceneWidth(getGameWidth());
 
@@ -57,6 +65,7 @@ public class GameLogicTest extends StandardGame {
 
         // Keyboard events
         getWindow().getScene().setOnKeyPressed(e -> {
+            KeyCode code = e.getCode();
             if (e.getCode() == KeyCode.LEFT) paddle.moveLeft();
             if (e.getCode() == KeyCode.RIGHT) paddle.moveRight();
             if (e.getCode() == KeyCode.SPACE && !ballLaunched) {
@@ -65,25 +74,31 @@ public class GameLogicTest extends StandardGame {
                 ball.setVelX(0);
                 ball.setVelY(-speed);
             }
+
+            // Test power-up: press L to toggle large paddle
+            if (code == KeyCode.L) {
+                paddle.setLarge(!paddle.isLarge());
+            }
         });
 
         getWindow().getScene().setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) paddle.stop();
         });
+
+        songBox.loop("level");
     }
 
     @Override
     public void tick() {
-        // Update all existing entities
         handler.tick();
 
         // Activate a trail from the pool
         if (ballLaunched && ball.isAlive()) {
             for (StandardTrail trail : trailPool) {
-                if (!trail.isActive()) { // Find an inactive trail
+                if (!trail.isActive()) {
                     trail.reset(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(),
                             ball.getCurrentColor(), 0.1);
-                    break; // Activate one trail per frame and stop
+                    break;
                 }
             }
         }
@@ -96,7 +111,11 @@ public class GameLogicTest extends StandardGame {
             handler.checkCollisions();
         }
 
-        if (!ball.isAlive()) resetBall();
+        // Ball lost
+        if (!ball.isAlive()) {
+            loseLife();
+            resetBall();
+        }
 
         boolean hasBricks = handler.getEntities().stream()
                 .anyMatch(e -> e.getId().toString().equals("Brick"));
@@ -106,12 +125,42 @@ public class GameLogicTest extends StandardGame {
 
     @Override
     public void render() {
-        StandardDraw.rect(0, 0, getGameWidth(), getGameHeight(), Color.BLACK, true);
+        // Vẽ nền
+        StandardDraw.rect(
+                0, 0,
+                getGameWidth(),
+                getGameHeight(),
+                Color.BLACK,
+                true
+        );
+
+        // Vẽ các entity (paddle, ball, brick, trail, ...)
         StandardDraw.Handler(handler);
+
+        // HUD
         StandardDraw.text("Level: " + level, 20, 30, "Arial", 20, Color.WHITE);
-        if (!ballLaunched) {
-            StandardDraw.text("Press SPACE to Launch Ball", getGameWidth() / 2.0 - 120, getGameHeight() / 2.0, "Arial", 18, Color.WHITE);
+        StandardDraw.text("Lives: " + lives, 20, 60, "Arial", 20, Color.WHITE);
+
+        if (gameOver) {
+            StandardDraw.text("GAME OVER", getGameWidth() / 2.0 - 80, getGameHeight() / 2.0,
+                    "Arial", 50, Color.RED);
+        } else if (!ballLaunched) {
+            StandardDraw.text("Press SPACE to Launch Ball",
+                    getGameWidth() / 2.0 - 120, getGameHeight() / 2.0,
+                    "Arial", 18, Color.WHITE);
         }
+    }
+
+    /** When the ball falls below the screen. */
+    private void loseLife() {
+        lives--;
+        if (lives <= 0) {
+            gameOver = true;
+            songBox.stopAll();
+            songBox.loop("gameover");
+            return;
+        }
+        resetBall();
     }
 
     /** Loads bricks for the current level. */
@@ -144,6 +193,8 @@ public class GameLogicTest extends StandardGame {
     /** Proceeds to the next level. */
     private void nextLevel() {
         level++;
+        songBox.stopAll();
+        songBox.loop("level");
         // Deactivate all trails to clean up for the next level
         for (StandardTrail trail : trailPool) {
             trail.setActive(false);

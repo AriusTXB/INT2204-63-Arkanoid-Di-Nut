@@ -1,5 +1,6 @@
 package standards.handler;
 
+import arkanoid.model.SongBox;
 import standards.main.StandardCamera;
 import standards.model.StandardGameObject;
 import standards.model.StandardID;
@@ -35,6 +36,8 @@ public class StandardHandler implements Renderable, Updatable {
      * visibility culling.
      */
     private StandardCamera stdCamera;
+
+    private SongBox songBox;
 
     /**
      * Constructs a {@code StandardHandler} linked to a specific camera.
@@ -286,6 +289,8 @@ public class StandardHandler implements Renderable, Updatable {
                         }
 
                         removeEntity(obj2);
+                        SongBox songBox = new SongBox();
+                        songBox.playExplode();
                         break;
                     }
                 }

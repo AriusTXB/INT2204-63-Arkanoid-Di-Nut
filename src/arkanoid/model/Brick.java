@@ -47,7 +47,7 @@ public class Brick extends StandardGameObject {
         String colorName = getColorName(this.color);
         if (colorName == null) return;
 
-        String path = "/Resources/model/Brick/" + colorName + "brick.png";
+        String path = "/entities/Brick/" + colorName + "brick.png";
         try {
             this.sprite = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
         } catch (Exception e) {
@@ -66,37 +66,19 @@ public class Brick extends StandardGameObject {
     /**
      * Renders the brick on the JavaFX canvas.
      */
-//    @Override
-//    public void render(GraphicsContext gc) {
-//        if (sprite == null || color == null) return;
-//
-//        // Draw semi-transparent shadow
-//        gc.setFill(new Color(0, 0, 0, 0.5));
-//        gc.fillRect(this.getX() + this.getWidth() / 3.0,
-//                this.getY() + this.getHeight() / 2.0,
-//                this.getWidth(),
-//                this.getHeight());
-//
-//        // Draw brick image
-//        gc.drawImage(sprite, this.getX(), this.getY(), WIDTH, HEIGHT);
-//    }
-
     @Override
     public void render(GraphicsContext gc) {
-        if (color == null) return;
+        if (sprite == null || color == null) return;
 
-        // Draw shadow
-        gc.setFill(new Color(0, 0, 0, 0.3));
-        gc.fillRect(this.getX() + 3, this.getY() + 3, this.getWidth(), this.getHeight());
+        // Draw semi-transparent shadow
+        gc.setFill(new Color(0, 0, 0, 0.5));
+        gc.fillRect(this.getX() + this.getWidth() / 3.0,
+                this.getY() + this.getHeight() / 2.0,
+                this.getWidth(),
+                this.getHeight());
 
-        // Draw main body
-        gc.setFill(color);
-        gc.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-
-        // Draw border
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1);
-        gc.strokeRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        // Draw brick image
+        gc.drawImage(sprite, this.getX(), this.getY(), WIDTH, HEIGHT);
     }
 
     /**
