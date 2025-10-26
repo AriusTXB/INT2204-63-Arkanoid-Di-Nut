@@ -44,7 +44,7 @@ public abstract class Item extends StandardGameObject {
    * @param x the x-coordinate of the item
    * @param y the y-coordinate of the item
    */
-  public Item(int x, int y) {
+  public Item(double x, double y) {
     super(x, y, 44, 22);
     this.frames = new ArrayList<>();
   }
