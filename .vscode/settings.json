@@ -1,5 +1,6 @@
 {
   "java.project.referencedLibraries": [
-    "C:/javafx-sdk-25/lib/*.jar"
+    "C:/javafx-sdk-25/lib/*.jar",
+    "C:/junit-jupiter-6.0.0.jar"
   ]
 }

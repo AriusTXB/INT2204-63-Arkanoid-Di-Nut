@@ -1,4 +1,6 @@
 package arkanoid.model.item;
 
-public class ItemList {
+public enum ItemList {
+  Large,
+	Multi;
 }
