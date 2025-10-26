@@ -95,7 +95,7 @@ public class Large extends Item {
     }
 
     if (this.isAlive()) {
-      this.getAnimation().animate();
+      this.getAnimation().updateAnimation();
 
       // Check collision only when near player level
       if (this.getY() >= 650) {
@@ -103,7 +103,7 @@ public class Large extends Item {
           if ((this.stdHandler.get(i).getId() == StandardID.Player)
               && (this.getBounds().intersects(this.stdHandler.get(i).getBounds()))) {
 
-            songBox.gainItem();
+            songBox.playPowerUp();
 
             Paddle player = (Paddle) this.stdHandler.get(i);
             player.setLarge(true);

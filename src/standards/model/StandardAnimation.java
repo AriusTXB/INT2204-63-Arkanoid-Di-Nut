@@ -179,4 +179,19 @@ public final class StandardAnimation {
     public boolean isMirrored() {
         return this.mirror;
     }
+
+    /**
+     * Updates the animation frame based on elapsed time and the configured FPS.
+     * This replaces the old `animate()` method from AWT-based versions.
+     */
+    public void updateAnimation() {
+        long now = System.nanoTime();
+        double frameDuration = 1_000_000_000.0 / this.fps;
+
+        if (now - this.lastTime >= frameDuration) {
+            this.advanceFrame();
+            this.lastTime = now;
+        }
+    }
+
 }
