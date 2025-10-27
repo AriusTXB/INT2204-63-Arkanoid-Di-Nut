@@ -23,7 +23,7 @@ public class Ball extends StandardGameObject {
     private final double LEFT_BORDER = 20;
 
     /** Right screen boundary offset. */
-    private final double RIGHT_BORDER = 30;
+    private final double RIGHT_BORDER = 20;
 
     /** Scene dimensions for boundary control. */
     private double sceneWidth = 800;
@@ -38,6 +38,7 @@ public class Ball extends StandardGameObject {
     public Ball(double x, double y, int difficulty) {
         super(x, y, 20, 20);
         this.setId(StandardID.Enemy);
+        this.root = root;
         setFixedVelocity(difficulty);
     }
 
