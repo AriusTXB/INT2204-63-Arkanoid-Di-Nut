@@ -78,12 +78,12 @@ public class Multi extends Item {
 
                         songBox.playPowerUp();
 
+                        int difficulty = stdGame.getDifficulty();
                         for (int j = 0; j < 2; j++) {
                             this.stdHandler.addEntity(new Ball(
                                     StdOps.randomInt(300, 500),
                                     StdOps.randomInt(200, 300),
-                                    this.stdGame,
-                                    this.stdGame.getDifficulty()
+                                    difficulty
                             ));
                         }
 

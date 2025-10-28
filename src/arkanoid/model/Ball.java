@@ -32,14 +32,16 @@ public class Ball extends StandardGameObject {
     /** Indicates whether the ball is active or lost. */
     private boolean isAlive = true;
 
+    /** Velocity of the ball in the x and y directions */
+    private double speedX, speedY;
+
     /**
      * Constructs a new Ball object at a given position and difficulty level.
      */
     public Ball(double x, double y, int difficulty) {
-        super(x, y, 20, 20);
+        super(x, y, 20, 20);  // Super class constructor for setting initial position and size
         this.setId(StandardID.Enemy);
-        this.root = root;
-        setFixedVelocity(difficulty);
+        setFixedVelocity(difficulty);  // Set velocity based on difficulty
     }
 
     /**
@@ -64,8 +66,8 @@ public class Ball extends StandardGameObject {
         if (dirX == 0) dirX = 1;
         if (dirY == 0) dirY = -1;
 
-        this.setVelX(speed * dirX);
-        this.setVelY(speed * dirY);
+        this.speedX = speed * dirX;
+        this.speedY = speed * dirY;
     }
 
     /**
@@ -76,11 +78,11 @@ public class Ball extends StandardGameObject {
 
         // Horizontal wall collisions
         if (this.getX() <= LEFT_BORDER || this.getX() >= sceneWidth - this.getWidth() - RIGHT_BORDER)
-            this.setVelX(-this.getVelX());
+            this.speedX = -this.speedX;  // Reverse direction
 
         // Top wall collision
         if (this.getY() <= LEFT_BORDER)
-            this.setVelY(-this.getVelY());
+            this.speedY = -this.speedY;  // Reverse direction
 
         // Fell below screen -> lose a life
         if (this.getY() > sceneHeight) {
@@ -88,9 +90,9 @@ public class Ball extends StandardGameObject {
             return;
         }
 
-        // Update position
-        this.setX(this.getX() + this.getVelX());
-        this.setY(this.getY() + this.getVelY());
+        // Update position based on velocity
+        this.setX(this.getX() + this.speedX);
+        this.setY(this.getY() + this.speedY);
     }
 
     /**
@@ -98,7 +100,7 @@ public class Ball extends StandardGameObject {
      */
     public void render(GraphicsContext gc) {
         if (!isAlive) return;
-        gc.setFill(stdFade.combine());
+        gc.setFill(stdFade.combine());  // Apply fade effect
         gc.fillOval(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
@@ -112,7 +114,9 @@ public class Ball extends StandardGameObject {
     /**
      * Checks if the ball is still active.
      */
-    public boolean isAlive() { return isAlive; }
+    public boolean isAlive() {
+        return isAlive;
+    }
 
     /**
      * Sets the scene dimensions so that the ball can respect the boundaries.

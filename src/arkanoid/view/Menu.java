@@ -1,50 +1,49 @@
 package arkanoid.view;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import arkanoid.controller.Game;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-/**
- * Menu chọn độ khó -> khởi chạy Game tương ứng.
- */
-public class Menu extends JFrame {
+public class Menu {
 
-    public Menu() {
-        setTitle("Arkanoid Menu");
-        setSize(400, 300);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new GridLayout(4, 1));
-
-        JLabel title = new JLabel("Select Difficulty", SwingConstants.CENTER);
-        JButton easyButton = new JButton("Easy (1)");
-        JButton normalButton = new JButton("Normal (2)");
-        JButton hardButton = new JButton("Hard (3)");
-
-        add(title);
-        add(easyButton);
-        add(normalButton);
-        add(hardButton);
-
-        easyButton.addActionListener(e -> startGame(1));
-        normalButton.addActionListener(e -> startGame(2));
-        hardButton.addActionListener(e -> startGame(3));
+    // Constructor to initialize Menu
+    public Menu(Stage primaryStage) {
+        // Menu UI setup code, to be used in ArkanoidRunner
+        getMenuScene(primaryStage);
     }
 
-    private void startGame(int difficulty) {
-        dispose(); // Đóng menu
-        Game game = new Game(difficulty);
-        JFrame frame = new JFrame("Arkanoid");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(game);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        game.start();
+    // This method will return the menu scene to ArkanoidRunner
+    public void getMenuScene(Stage primaryStage) {
+        // Create buttons for Play and Exit
+        Button playButton = new Button("Play");
+        Button exitButton = new Button("Exit");
+
+        // Set actions for buttons
+        playButton.setOnAction(e -> startGame(primaryStage));
+        exitButton.setOnAction(e -> exitGame());
+
+        // Layout to hold the buttons
+        VBox buttonLayout = new VBox(20);
+        buttonLayout.getChildren().addAll(playButton, exitButton);
+        buttonLayout.setStyle("-fx-alignment: center;");
+
+        // Create and return the scene
+        Scene scene = new Scene(buttonLayout, 300, 250);
+        primaryStage.setScene(scene);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Menu().setVisible(true));
+    public void startGame(Stage primaryStage) {
+        // Game logic to transition to the game screen
+        Game game = new Game(1);  // Start the game with difficulty level 1
+
+        // Set up the game scene and start the game
+        Scene gameScene = new Scene(game.getCanvas().getParent(), 800, 600);
+        primaryStage.setScene(gameScene);
+    }
+
+    public void exitGame() {
+        System.exit(0); // Exit the game
     }
 }

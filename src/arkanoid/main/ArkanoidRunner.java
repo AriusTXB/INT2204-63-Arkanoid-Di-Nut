@@ -1,22 +1,17 @@
 package arkanoid.main;
 
 import arkanoid.view.Menu;
-import arkanoid.controller.*;
-import arkanoid.view.GUI;
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class ArkanoidRunner extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize the main menu
-        Menu menu = new Menu();
+        // Initialize the main menu and pass primaryStage
+        Menu menu = new Menu(primaryStage);
 
-        // Start the menu scene
-        Scene menuScene = menu.getMenuScene();
-        primaryStage.setScene(menuScene);
+        // Show the initial menu
         primaryStage.setTitle("Arkanoid Game");
         primaryStage.show();
     }
