@@ -30,17 +30,14 @@ public class Menu {
         buttonLayout.setStyle("-fx-alignment: center;");
 
         // Create and return the scene
-        Scene scene = new Scene(buttonLayout, 300, 250);
+        Scene scene = new Scene(buttonLayout, 800, 600);
         primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public void startGame(Stage primaryStage) {
-        // Game logic to transition to the game screen
-        Game game = new Game(1);  // Start the game with difficulty level 1
-
-        // Set up the game scene and start the game
-        Scene gameScene = new Scene(game.getCanvas().getParent(), 800, 600);
-        primaryStage.setScene(gameScene);
+        Game game = new Game(primaryStage);
+        game.StartGame();
     }
 
     public void exitGame() {

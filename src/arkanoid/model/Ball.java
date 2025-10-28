@@ -39,7 +39,7 @@ public class Ball extends StandardGameObject {
      * Constructs a new Ball object at a given position and difficulty level.
      */
     public Ball(double x, double y, int difficulty) {
-        super(x, y, 20, 20);  // Super class constructor for setting initial position and size
+        super(x, y, 15, 15);  // Super class constructor for setting initial position and size
         this.setId(StandardID.Enemy);
         setFixedVelocity(difficulty);  // Set velocity based on difficulty
     }
@@ -53,8 +53,6 @@ public class Ball extends StandardGameObject {
             case 1 -> speed = 4;
             case 2 -> speed = 6;
             case 3 -> speed = 8;
-            case 4 -> speed = 10;
-            case 5 -> speed = 12;
             default -> speed = 5;
         }
 
@@ -66,8 +64,8 @@ public class Ball extends StandardGameObject {
         if (dirX == 0) dirX = 1;
         if (dirY == 0) dirY = -1;
 
-        this.speedX = speed * dirX;
-        this.speedY = speed * dirY;
+        this.setVelX(speed * dirX);
+        this.setVelY(speed * dirY);
     }
 
     /**
@@ -78,11 +76,11 @@ public class Ball extends StandardGameObject {
 
         // Horizontal wall collisions
         if (this.getX() <= LEFT_BORDER || this.getX() >= sceneWidth - this.getWidth() - RIGHT_BORDER)
-            this.speedX = -this.speedX;  // Reverse direction
+            this.setVelX(-this.getVelX()); // Reverse direction
 
         // Top wall collision
         if (this.getY() <= LEFT_BORDER)
-            this.speedY = -this.speedY;  // Reverse direction
+            this.setVelY(-this.getVelY());  // Reverse direction
 
         // Fell below screen -> lose a life
         if (this.getY() > sceneHeight) {
@@ -91,8 +89,8 @@ public class Ball extends StandardGameObject {
         }
 
         // Update position based on velocity
-        this.setX(this.getX() + this.speedX);
-        this.setY(this.getY() + this.speedY);
+        this.setX(this.getX() + this.getVelX());
+        this.setY(this.getY() + this.getVelY());
     }
 
     /**
