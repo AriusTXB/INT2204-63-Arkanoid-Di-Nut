@@ -1,5 +1,8 @@
 package arkanoid.model;
 
+import arkanoid.controller.Game;
+import arkanoid.model.item.Large;
+import arkanoid.model.item.Multi;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import standards.main.StandardDraw;
@@ -7,12 +10,8 @@ import standards.controller.StandardFadeController;
 import standards.model.StandardGameObject;
 import standards.model.StandardID;
 import standards.util.StdOps;
+import standards.handler.StandardHandler;
 
-/**
- * Represents the moving ball in the Arkanoid game.
- * The ball's sole responsibility is to move and collide.
- * Trail creation is handled externally by GameLogicTest for performance.
- */
 public class Ball extends StandardGameObject {
 
     /** Fade controller for dynamic color blending during motion. */
@@ -35,12 +34,18 @@ public class Ball extends StandardGameObject {
     /** Velocity of the ball in the x and y directions */
     private double speedX, speedY;
 
+    private StandardHandler handler;
+    private Game game;
+    private SongBox songBox;
+
     /**
      * Constructs a new Ball object at a given position and difficulty level.
      */
-    public Ball(double x, double y, int difficulty) {
-        super(x, y, 15, 15);  // Super class constructor for setting initial position and size
+    public Ball(double x, double y, int difficulty, StandardHandler handler, Game game) {
+        super(x, y, 15, 15);
         this.setId(StandardID.Enemy);
+        this.handler = handler;
+        this.game = game;
         setFixedVelocity(difficulty);  // Set velocity based on difficulty
     }
 
@@ -93,32 +98,109 @@ public class Ball extends StandardGameObject {
         this.setY(this.getY() + this.getVelY());
     }
 
-    /**
-     * Renders the ball with a fade effect on the given graphics context.
-     */
+    @Override
     public void render(GraphicsContext gc) {
         if (!isAlive) return;
-        gc.setFill(stdFade.combine());  // Apply fade effect
+        gc.setFill(stdFade.combine());
         gc.fillOval(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
-    /**
-     * Gets the current color of the ball.
-     */
+    public void handleCollisions(StandardHandler handler) {
+        for (int i = 0; i < handler.getEntities().size(); i++) {
+            StandardGameObject obj = handler.getEntities().get(i);
+
+            if (obj == this) continue;
+
+            if (!this.getBounds().intersects(obj.getBounds())) continue;
+
+            // BALL - PADDLE
+            if (obj.getId() == StandardID.Player) {
+                double ballCenter = this.getX() + this.getWidth() / 2.0;
+                double paddleCenter = obj.getX() + obj.getWidth() / 2.0;
+                double relativeIntersect = (ballCenter - paddleCenter) / (obj.getWidth() / 2.0);
+
+                relativeIntersect = Math.max(-1.0, Math.min(1.0, relativeIntersect));
+
+                double maxAngle = Math.toRadians(60);
+                double bounceAngle = relativeIntersect * maxAngle;
+
+                double speed = Math.sqrt(getVelX() * getVelX() + getVelY() * getVelY());
+                setVelX(speed * Math.sin(bounceAngle));
+                setVelY(-Math.abs(speed * Math.cos(bounceAngle)));
+
+                setY(obj.getY() - getHeight() - 1);
+            }
+
+            // BALL - BRICK
+            else if (obj.getId() == StandardID.Brick) {
+                double ballLeft = this.getX();
+                double ballRight = this.getX() + this.getWidth();
+                double ballTop = this.getY();
+                double ballBottom = this.getY() + this.getHeight();
+
+                double brickLeft = obj.getX();
+                double brickRight = obj.getX() + obj.getWidth();
+                double brickTop = obj.getY();
+                double brickBottom = obj.getY() + obj.getHeight();
+
+                double overlapLeft = ballRight - brickLeft;
+                double overlapRight = brickRight - ballLeft;
+                double overlapTop = ballBottom - brickTop;
+                double overlapBottom = brickBottom - ballTop;
+
+                double minOverlapX = Math.min(overlapLeft, overlapRight);
+                double minOverlapY = Math.min(overlapTop, overlapBottom);
+
+                if (minOverlapX < minOverlapY) {
+                    if (overlapLeft < overlapRight)
+                        setX(brickLeft - getWidth() - 0.5);
+                    else
+                        setX(brickRight + 0.5);
+
+                    setVelX(-getVelX());
+                } else {
+                    if (overlapTop < overlapBottom)
+                        setY(brickTop - getHeight() - 0.5);
+                    else
+                        setY(brickBottom + 0.5);
+
+                    setVelY(-getVelY());
+                }
+
+                handler.removeEntity(obj);
+
+                SongBox songBox = new SongBox();
+                songBox.playExplode();
+
+                spawnRandomItem((Brick)obj);
+
+                break;
+            }
+        }
+    }
+
+    private void spawnRandomItem(Brick brick) {
+        if (Math.random() < 0.3) {
+            double x = brick.getX() + brick.getWidth() / 2.0;
+            double y = brick.getY() + brick.getHeight() / 2.0;
+
+            if (Math.random() < 0.5) {
+                handler.addEntity(new Large((int)x, (int)y, game, handler));
+            } else {
+                handler.addEntity(new Multi(x, y, game, handler));
+            }
+        }
+    }
+
+
     public Color getCurrentColor() {
         return stdFade.combine();
     }
 
-    /**
-     * Checks if the ball is still active.
-     */
     public boolean isAlive() {
         return isAlive;
     }
 
-    /**
-     * Sets the scene dimensions so that the ball can respect the boundaries.
-     */
     public void setSceneSize(double width, double height) {
         this.sceneWidth = width;
         this.sceneHeight = height;

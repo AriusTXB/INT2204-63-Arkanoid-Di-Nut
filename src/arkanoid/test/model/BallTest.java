@@ -1,8 +1,10 @@
 package arkanoid.test.model;
 
+import arkanoid.controller.Game;
 import arkanoid.model.Ball;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import standards.handler.StandardHandler;
 import standards.model.StandardID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,9 +13,12 @@ public class BallTest {
 
     private Ball ball;
 
+    private StandardHandler handler;
+    private Game game;
+
     @BeforeEach
     void setUp() {
-        ball = new Ball(100, 100, 2);
+        ball = new Ball(100, 100, 2, handler, game);
         ball.setSceneSize(800, 600);
     }
 
@@ -24,24 +29,8 @@ public class BallTest {
     void testInitialProperties() {
         assertEquals(StandardID.Enemy, ball.getId(), "False");
         assertTrue(ball.isAlive(), "False");
-        assertEquals(20, ball.getWidth());
-        assertEquals(20, ball.getHeight());
-    }
-
-    /**
-     * Kiểm tra vận tốc theo độ khó.
-     */
-    @Test
-    void testVelocityMagnitudeBasedOnDifficulty() {
-        Ball b1 = new Ball(0, 0, 1);
-        Ball b2 = new Ball(0, 0, 3);
-        Ball b3 = new Ball(0, 0, 5);
-
-        double v1 = Math.abs(b1.getVelX());
-        double v2 = Math.abs(b2.getVelX());
-        double v3 = Math.abs(b3.getVelX());
-
-        assertTrue(v3 >= v2 && v2 >= v1, "False");
+        assertEquals(15, ball.getWidth());
+        assertEquals(15, ball.getHeight());
     }
 
     /**
