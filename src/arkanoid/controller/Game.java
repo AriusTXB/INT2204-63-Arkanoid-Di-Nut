@@ -19,7 +19,7 @@ public class Game extends StandardGame {
 
     private StandardHandler handler;
     private Paddle paddle;
-    private Ball ball;
+    private final List<Ball> balls = new ArrayList<>();
     private Level currentLevel;
     private int difficulty = 1;
     private boolean ballLaunched = false;
@@ -57,12 +57,18 @@ public class Game extends StandardGame {
         paddle = new Paddle(getGameWidth() / 2.0 - 50, getGameHeight() - 40);
         paddle.setSceneWidth(getGameWidth());
 
-        ball = new Ball(paddle.getX() + paddle.getWidth() / 2 - 4,
-                paddle.getY() - 10, difficulty);
-        ball.setSceneSize(getGameWidth(), getGameHeight());
-
+        // Ball đầu tiên
+        Ball mainBall = new Ball(
+                paddle.getX() + paddle.getWidth() / 2 - 4,
+                paddle.getY() - 10,
+                difficulty,
+                handler,
+                this
+        );
+        mainBall.setSceneSize(getGameWidth(), getGameHeight());
+        balls.add(mainBall);
         handler.addEntity(paddle);
-        handler.addEntity(ball);
+        handler.addEntity(mainBall);
 
         // Load first level
         loadLevel(difficulty);
@@ -76,9 +82,9 @@ public class Game extends StandardGame {
             if (code == KeyCode.RIGHT) paddle.moveRight();
             if (code == KeyCode.SPACE && !ballLaunched) {
                 ballLaunched = true;
-                double speed = Math.abs(ball.getVelY());
-                ball.setVelX(0);
-                ball.setVelY(-speed);
+                double speed = Math.abs(mainBall.getVelY());
+                mainBall.setVelX(0);
+                mainBall.setVelY(-speed);
             }
             if (code == KeyCode.L) paddle.setLarge(!paddle.isLarge());
         });
@@ -96,28 +102,35 @@ public class Game extends StandardGame {
 
         handler.tick();
 
-        // Activate a trail from the pool
-        if (ballLaunched && ball.isAlive()) {
-            for (StandardTrail trail : trailPool) {
-                if (!trail.isActive()) {
-                    trail.reset(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(),
-                            ball.getCurrentColor(), 0.1);
-                    break;
-                }
-            }
-        }
-
         if (!ballLaunched) {
-            // Keep ball on paddle
-            ball.setX(paddle.getX() + paddle.getWidth() / 2 - ball.getWidth() / 2);
-            ball.setY(paddle.getY() - ball.getHeight() - 2);
+            // Gắn bóng chính (đầu tiên) vào paddle
+            Ball first = balls.get(0);
+            first.setX(paddle.getX() + paddle.getWidth() / 2 - first.getWidth() / 2);
+            first.setY(paddle.getY() - first.getHeight() - 2);
         } else {
             handler.checkCollisions();
         }
 
-        if (!ball.isAlive()) {
+        // Loại bỏ các bóng chết
+        balls.removeIf(ball -> !ball.isAlive());
+
+        // Nếu tất cả bóng đã mất => trừ mạng
+        if (balls.isEmpty()) {
             loseLife();
             resetBall();
+        }
+
+        // Thêm trail cho tất cả bóng đang sống
+        for (Ball b : balls) {
+            if (ballLaunched && b.isAlive()) {
+                for (StandardTrail trail : trailPool) {
+                    if (!trail.isActive()) {
+                        trail.reset(b.getX(), b.getY(), b.getWidth(), b.getHeight(),
+                                b.getCurrentColor(), 0.1);
+                        break;
+                    }
+                }
+            }
         }
 
         boolean hasBricks = handler.getEntities().stream()
@@ -183,12 +196,22 @@ public class Game extends StandardGame {
 
     /** Reset the ball when lost */
     private void resetBall() {
-        handler.removeEntity(ball);
-        ball = new Ball(paddle.getX() + paddle.getWidth() / 2 - 4, paddle.getY() - 10, difficulty);
-        ball.setSceneSize(getGameWidth(), getGameHeight());
-        handler.addEntity(ball);
+        for (Ball b : balls) handler.removeEntity(b);
+        balls.clear();
+
+        Ball newBall = new Ball(
+                paddle.getX() + paddle.getWidth() / 2 - 4,
+                paddle.getY() - 10,
+                difficulty,
+                handler,
+                this
+        );
+        newBall.setSceneSize(getGameWidth(), getGameHeight());
+        handler.addEntity(newBall);
+        balls.add(newBall);
         ballLaunched = false;
     }
+
 
     /** Move to the next level */
     private void nextLevel() {
@@ -204,11 +227,23 @@ public class Game extends StandardGame {
         for (StandardTrail trail : trailPool) handler.addEntity(trail);
         handler.addEntity(paddle);
 
-        ball = new Ball(paddle.getX() + paddle.getWidth() / 2 - 4, paddle.getY() - 10, difficulty);
-        ball.setSceneSize(getGameWidth(), getGameHeight());
-        handler.addEntity(ball);
+        balls.clear();
+        Ball newBall = new Ball(
+                paddle.getX() + paddle.getWidth() / 2 - 4,
+                paddle.getY() - 10,
+                difficulty,
+                handler,
+                this
+        );
+        newBall.setSceneSize(getGameWidth(), getGameHeight());
+        handler.addEntity(newBall);
+        balls.add(newBall);
+        ballLaunched = false;
 
         loadLevel(difficulty);
-        ballLaunched = false;
+    }
+
+    public void addBall(Ball b) {
+        balls.add(b);
     }
 }

@@ -26,7 +26,6 @@ public class SongBox {
         loadSound("menu", "media/audio/menu.mp3");
         loadSound("level", "media/audio/level.mp3");
         loadSound("explode", "media/audio/explode.mp3");
-        loadSound("powerup", "media/audio/powerup.mp3");
         loadSound("gameover", "media/audio/gameover.mp3");
     }
 
@@ -63,8 +62,6 @@ public class SongBox {
     public void playLevel() { play("level"); }
 
     public void playExplode() { play("explode"); }
-
-    public void playPowerUp() { play("powerup"); }
 
     public void playGameOver() { play("gameover"); }
 

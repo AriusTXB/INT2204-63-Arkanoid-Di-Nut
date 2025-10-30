@@ -69,7 +69,7 @@ public class Paddle extends StandardGameObject {
             normalSprite = new Image(getClass().getResourceAsStream("/entities/Paddle/paddle.png"));
             largeSprite = new Image(getClass().getResourceAsStream("/entities/Paddle/paddle_large.png"));
         } catch (Exception e) {
-            System.err.println("⚠️ Failed to load paddle sprites: " + e.getMessage());
+            System.err.println("Failed to load paddle sprites: " + e.getMessage());
             normalSprite = null;
             largeSprite = null;
         }

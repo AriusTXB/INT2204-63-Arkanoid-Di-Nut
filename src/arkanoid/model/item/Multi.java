@@ -1,20 +1,18 @@
 package arkanoid.model.item;
 
+import arkanoid.model.Paddle;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import standards.handler.StandardHandler;
-import standards.model.StandardAnimation;
 import standards.model.StandardGameObject;
 import standards.model.StandardID;
-import standards.model.StandardParticle;
 import standards.util.StdOps;
 
 import arkanoid.model.Ball;
 import arkanoid.model.BasicParticle;
 import arkanoid.controller.Game;
-import arkanoid.model.SongBox;
 
 /**
  * {@code Multi} represents a collectible item that grants the player extra balls
@@ -25,29 +23,21 @@ import arkanoid.model.SongBox;
  */
 public class Multi extends Item {
 
-    private Game stdGame;
-    private StandardHandler stdHandler;
-    private SongBox songBox;
+    private final Game stdGame;
+    private final StandardHandler stdHandler;
 
-    private static final int MAX_FRAMES = 6;
     private static final double FALL_SPEED = 2.0;
-    private static final double FPS = 120.0;
+    private static final Image SPRITE =
+            new Image(Multi.class.getResourceAsStream("/entities/PowerUp/multi.png"));
 
-    public Multi(double x, double y, Game stdGame, StandardHandler stdHandler, SongBox songBox) {
+    public Multi(double x, double y, Game stdGame, StandardHandler stdHandler) {
         super(x, y);
         this.setId(StandardID.Multi);
 
         this.stdGame = stdGame;
         this.stdHandler = stdHandler;
-        this.songBox = songBox;
-
-        Image[] frames = new Image[MAX_FRAMES];
-        for (int i = 0; i < MAX_FRAMES; i++) {
-            frames[i] = new Image("file:Resources/Sprites/Items/Multi/multi" + i + ".png");
-        }
 
         this.setVelY(FALL_SPEED);
-        this.setAnimation(new StandardAnimation(this, frames, FPS));
     }
 
     @Override
@@ -69,27 +59,15 @@ public class Multi extends Item {
         }
 
         if (this.isAlive()) {
-            this.getAnimation().updateAnimation();
-
-            if (this.getY() >= 650) {
-                for (StandardGameObject obj : this.stdHandler.getEntities()) {
-                    if (obj.getId() == StandardID.Player &&
+            for (StandardGameObject obj : new java.util.ArrayList<>(stdHandler.getEntities())) {
+                if (obj.getId() == StandardID.Player &&
                         this.getBounds().intersects(obj.getBounds())) {
 
-                        songBox.playPowerUp();
+                    Paddle player = (Paddle) obj;
+                    applyEffect(player);
 
-                        int difficulty = stdGame.getDifficulty();
-                        for (int j = 0; j < 2; j++) {
-                            this.stdHandler.addEntity(new Ball(
-                                    StdOps.randomInt(300, 500),
-                                    StdOps.randomInt(200, 300),
-                                    difficulty
-                            ));
-                        }
-
-                        this.stdHandler.removeEntity(this);
-                        return;
-                    }
+                    this.stdHandler.removeEntity(this);
+                    return;
                 }
             }
 
@@ -99,6 +77,24 @@ public class Multi extends Item {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.drawImage(this.getAnimation().getView().getCurrentFrame(), this.getX(), this.getY());
+        gc.drawImage(SPRITE, this.getX(), this.getY());
     }
+
+    @Override
+    public void applyEffect(Paddle paddle) {
+        int difficulty = stdGame.getDifficulty();
+        for (int j = 0; j < 2; j++) {
+            Ball newBall = new Ball(
+                    StdOps.randomInt(300, 500),
+                    StdOps.randomInt(200, 300),
+                    difficulty,
+                    stdHandler,
+                    stdGame
+            );
+            newBall.setSceneSize(stdGame.getGameWidth(), stdGame.getGameHeight());
+            stdHandler.addEntity(newBall);
+            stdGame.addBall(newBall);
+        }
+    }
+
 }
