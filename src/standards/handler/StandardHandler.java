@@ -1,5 +1,6 @@
 package standards.handler;
 
+import arkanoid.model.Ball;
 import arkanoid.model.SongBox;
 import standards.main.StandardCamera;
 import standards.model.StandardGameObject;
@@ -94,7 +95,7 @@ public class StandardHandler implements Renderable, Updatable {
      */
     @Override
     public void tick() {
-        for (StandardGameObject entity : this.entities) {
+        for (StandardGameObject entity : new ArrayList<>(entities)) {
             entity.tick();
         }
     }
@@ -211,89 +212,9 @@ public class StandardHandler implements Renderable, Updatable {
      * Checks for collisions between entities in the handler.
      */
     public void checkCollisions() {
-        for (int i = 0; i < entities.size(); i++) {
-            StandardGameObject obj1 = entities.get(i);
-
-            if (obj1.getId() == StandardID.Enemy) {
-                for (int j = 0; j < entities.size(); j++) {
-                    if (i == j) continue;
-
-                    StandardGameObject obj2 = entities.get(j);
-
-                    if (!obj1.getBounds().intersects(obj2.getBounds())) continue;
-
-                    // BALL - PADDLE
-                    if (obj2.getId() == StandardID.Player) {
-                        double ballCenter = obj1.getX() + obj1.getWidth() / 2.0;
-                        double paddleCenter = obj2.getX() + obj2.getWidth() / 2.0;
-                        double relativeIntersect = (ballCenter - paddleCenter) / (obj2.getWidth() / 2.0);
-
-                        // Giới hạn góc phản xạ
-                        relativeIntersect = Math.max(-1.0, Math.min(1.0, relativeIntersect));
-
-                        // Góc tối đa
-                        double maxAngle = Math.toRadians(60);
-                        double bounceAngle = relativeIntersect * maxAngle;
-
-                        // Tính lại vận tốc dựa theo góc phản xạ
-                        double speed = Math.sqrt(obj1.getVelX() * obj1.getVelX() + obj1.getVelY() * obj1.getVelY());
-                        obj1.setVelX(speed * Math.sin(bounceAngle));
-                        obj1.setVelY(-Math.abs(speed * Math.cos(bounceAngle)));
-
-                        // Đặt lại bóng phía trên paddle để tránh dính
-                        obj1.setY(obj2.getY() - obj1.getHeight() - 1);
-                    }
-
-                    // BALL - BRICK
-                    else if (obj2.getId() == StandardID.Brick) {
-                        double ballLeft = obj1.getX();
-                        double ballRight = obj1.getX() + obj1.getWidth();
-                        double ballTop = obj1.getY();
-                        double ballBottom = obj1.getY() + obj1.getHeight();
-
-                        double brickLeft = obj2.getX();
-                        double brickRight = obj2.getX() + obj2.getWidth();
-                        double brickTop = obj2.getY();
-                        double brickBottom = obj2.getY() + obj2.getHeight();
-
-                        // Tính độ chồng lấn
-                        double overlapLeft = ballRight - brickLeft;
-                        double overlapRight = brickRight - ballLeft;
-                        double overlapTop = ballBottom - brickTop;
-                        double overlapBottom = brickBottom - ballTop;
-
-                        // Chọn hướng va chạm nhỏ nhất
-                        double minOverlapX = Math.min(overlapLeft, overlapRight);
-                        double minOverlapY = Math.min(overlapTop, overlapBottom);
-
-                        if (minOverlapX < minOverlapY) {
-                            // Va chạm ngang
-                            if (overlapLeft < overlapRight) {
-                                // Chạm từ trái
-                                obj1.setX(brickLeft - obj1.getWidth() - 0.5);
-                            } else {
-                                // Chạm từ phải
-                                obj1.setX(brickRight + 0.5);
-                            }
-                            obj1.setVelX(-obj1.getVelX());
-                        } else {
-                            // Va chạm dọc
-                            if (overlapTop < overlapBottom) {
-                                // Chạm từ trên
-                                obj1.setY(brickTop - obj1.getHeight() - 0.5);
-                            } else {
-                                // Chạm từ dưới
-                                obj1.setY(brickBottom + 0.5);
-                            }
-                            obj1.setVelY(-obj1.getVelY());
-                        }
-
-                        removeEntity(obj2);
-                        SongBox songBox = new SongBox();
-                        songBox.playExplode();
-                        break;
-                    }
-                }
+        for (StandardGameObject entity : new ArrayList<>(entities)) {
+            if (entity instanceof Ball ball) {
+                ball.handleCollisions(this);
             }
         }
     }
