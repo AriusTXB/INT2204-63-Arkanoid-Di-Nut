@@ -1,9 +1,6 @@
 package arkanoid.controller;
 
-import arkanoid.model.Ball;
-import arkanoid.model.Brick;
-import arkanoid.model.Paddle;
-import arkanoid.model.SongBox;
+import arkanoid.model.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -25,7 +22,7 @@ public class Game extends StandardGame {
     private boolean ballLaunched = false;
     private SongBox songBox;
 
-    private int lives = 3;
+    private Lives lives;
     private boolean gameOver = false;
 
     private final List<StandardTrail> trailPool = new ArrayList<>();
@@ -44,6 +41,7 @@ public class Game extends StandardGame {
     public void initGame() {
         handler = new StandardHandler();
         songBox = new SongBox();
+        lives = new Lives(3, 20, 20);
 
         // Create the trail pool
         trailPool.clear();
@@ -82,11 +80,13 @@ public class Game extends StandardGame {
             if (code == KeyCode.RIGHT) paddle.moveRight();
             if (code == KeyCode.SPACE && !ballLaunched) {
                 ballLaunched = true;
-                double speed = Math.abs(mainBall.getVelY());
-                mainBall.setVelX(0);
-                mainBall.setVelY(-speed);
+                if (!balls.isEmpty()) {
+                    Ball activeBall = balls.get(0);
+                    double speed = 5;
+                    activeBall.setVelX(0);
+                    activeBall.setVelY(-speed);
+                }
             }
-            if (code == KeyCode.L) paddle.setLarge(!paddle.isLarge());
         });
 
         getWindow().getScene().setOnKeyReleased(e -> {
@@ -149,12 +149,9 @@ public class Game extends StandardGame {
                 true
         );
 
-        // Entities
         StandardDraw.Handler(handler);
 
-        // HUD
-        StandardDraw.text("Level: " + difficulty, 20, 30, "Arial", 20, Color.WHITE);
-        StandardDraw.text("Lives: " + lives, 20, 60, "Arial", 20, Color.WHITE);
+        lives.render();
 
         if (gameOver) {
             StandardDraw.text("GAME OVER", getGameWidth() / 2.0 - 120, getGameHeight() / 2.0,
@@ -168,8 +165,8 @@ public class Game extends StandardGame {
 
     /** Lose one life when ball falls. */
     private void loseLife() {
-        lives--;
-        if (lives <= 0) {
+        lives.loseLife();
+        if (lives.isDead()) {
             gameOver = true;
             songBox.stopAll();
             songBox.loop("gameover");
@@ -207,6 +204,10 @@ public class Game extends StandardGame {
                 this
         );
         newBall.setSceneSize(getGameWidth(), getGameHeight());
+
+        newBall.setVelX(0);
+        newBall.setVelY(0);
+
         handler.addEntity(newBall);
         balls.add(newBall);
         ballLaunched = false;
