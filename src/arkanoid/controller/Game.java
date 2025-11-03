@@ -5,6 +5,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import standards.handler.StandardHandler;
+import standards.model.StandardID;
 import standards.model.StandardTrail;
 import standards.platform.StandardGame;
 import standards.main.StandardDraw;
@@ -82,9 +83,7 @@ public class Game extends StandardGame {
                 ballLaunched = true;
                 if (!balls.isEmpty()) {
                     Ball activeBall = balls.get(0);
-                    double speed = 5;
                     activeBall.setVelX(0);
-                    activeBall.setVelY(-speed);
                 }
             }
         });
@@ -224,7 +223,7 @@ public class Game extends StandardGame {
             trail.setActive(false);
         }
 
-        handler.clearEntities();
+        handler.clearAllEntities();
         for (StandardTrail trail : trailPool) handler.addEntity(trail);
         handler.addEntity(paddle);
 
@@ -246,5 +245,9 @@ public class Game extends StandardGame {
 
     public void addBall(Ball b) {
         balls.add(b);
+    }
+
+    public List<Ball> getBalls() {
+        return balls;
     }
 }

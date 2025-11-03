@@ -82,19 +82,24 @@ public class Multi extends Item {
 
     @Override
     public void applyEffect(Paddle paddle) {
-        int difficulty = stdGame.getDifficulty();
+        Ball refBall = stdGame.getBalls().get(0);
+        double refSpeedX = refBall.getVelX();
+        double refSpeedY = refBall.getVelY();
+
         for (int j = 0; j < 2; j++) {
             Ball newBall = new Ball(
                     StdOps.randomInt(300, 500),
                     StdOps.randomInt(200, 300),
-                    difficulty,
+                    stdGame.getDifficulty(),
                     stdHandler,
                     stdGame
             );
+
             newBall.setSceneSize(stdGame.getGameWidth(), stdGame.getGameHeight());
             stdHandler.addEntity(newBall);
             stdGame.addBall(newBall);
         }
     }
+
 
 }
