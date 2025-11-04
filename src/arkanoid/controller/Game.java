@@ -83,7 +83,9 @@ public class Game extends StandardGame {
                 ballLaunched = true;
                 if (!balls.isEmpty()) {
                     Ball activeBall = balls.get(0);
+                    activeBall.resetVelocity(difficulty);
                     activeBall.setVelX(0);
+                    if (activeBall.getVelY() > 0) activeBall.setVelY(-activeBall.getVelY());
                 }
             }
         });

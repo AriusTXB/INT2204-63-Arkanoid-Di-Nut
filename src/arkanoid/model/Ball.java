@@ -205,4 +205,8 @@ public class Ball extends StandardGameObject {
         this.sceneWidth = width;
         this.sceneHeight = height;
     }
+
+    public void resetVelocity(int difficulty) {
+        setFixedVelocity(difficulty);
+    }
 }
