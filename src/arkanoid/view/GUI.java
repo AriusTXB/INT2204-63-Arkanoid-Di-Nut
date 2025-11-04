@@ -17,17 +17,21 @@ public class GUI extends Application {
         // Create the root Pane
         StackPane root = new StackPane();
 
-        // Create the dynamic background (ensure Background class handles the Pane correctly)
-        background = new Background(root);
+        // [MODIFIED] Create the dynamic background using image API (not video)
+        // If your Background supports Background(String) use that; otherwise use loadImage().
+        // Using constructor that accepts filepath (preferred).
+        background = new Background("media/img/BG2.png"); // [MODIFIED]
 
-        // Load the first background video
-        background.loadVideo("resources/background_video1.mp4");
+        // If your Background only has no-arg constructor and loadImage method, use:
+        // background = new Background(root);
+        // background.loadImage("media/img/BG2.png"); // [MODIFIED alternative]
 
-        // Create Play button to start or change background video
+        // Create Play button to start or change background image (was video)
         Button playButton = new Button("Play");
         playButton.setOnAction(e -> {
-            // Change the background video dynamically
-            background.loadVideo("resources/background_video2.mp4");
+            // Change the background image dynamically
+            background.loadImage("media/img/BG1.png"); // [MODIFIED] use loadImage instead of loadVideo
+            // or background.setImage("media/img/BG1.png");
         });
 
         // Create Exit button to close the application
@@ -44,12 +48,16 @@ public class GUI extends Application {
 
         // Create the scene and add it to the stage
         Scene scene = new Scene(root, 800, 600);
-        primaryStage.setTitle("Game GUI with Dynamic Video Background");
+        primaryStage.setTitle("Game GUI with Dynamic Image Background");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static void main(String[] args) {
         launch(args);  // Launch the JavaFX application
+    }
+
+    public Background getBackground() {
+        return background;
     }
 }

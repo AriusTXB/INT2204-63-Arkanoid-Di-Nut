@@ -5,91 +5,76 @@ import javafx.scene.image.ImageView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import javafx.scene.image.Image;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+
+import java.io.File;
 
 class BackgroundTest {
     private Background background;
+    private String validImagePath;
+    private String invalidImagePath;
 
     @BeforeEach
     void setUp() {
-        // Cài đặt trước khi mỗi test case chạy
-    }
+        // Tạo ảnh giả lập cho test (nếu file tồn tại sẵn thì bỏ qua)
+        validImagePath = "media/img/BG2.png";
+        invalidImagePath = "media/img/invalid.png";
 
-    @Test
-    void testInitializeVideoBackground_ValidPath() {
-        // Đảm bảo rằng video được tải đúng khi đường dẫn hợp lệ
-        background = new Background("path/to/valid/video.mp4", true);
-        assertNotNull(background);
-        // Kiểm tra rằng video đã được khởi tạo
-        MediaView mediaView = (MediaView) background.getChildrenUnmodifiable().get(0);
-        assertNotNull(mediaView);
-        MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
-        assertNotNull(mediaPlayer);
-        assertTrue(mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING);
-    }
-
-    @Test
-    void testInitializeVideoBackground_InvalidPath() {
-        // Đảm bảo rằng video không được tải khi đường dẫn không hợp lệ
-        background = new Background("path/to/invalid/video.mp4", true);
-        assertNull(background.getChildrenUnmodifiable().get(0));  // Không có MediaView được thêm vào
+        // Đảm bảo file tồn tại để test không lỗi
+        File f = new File(validImagePath);
+        if (!f.exists()) {
+            System.err.println("⚠️ Warning: Test image not found at " + validImagePath);
+        }
     }
 
     @Test
     void testInitializeImageBackground_ValidPath() {
-        // Đảm bảo rằng hình ảnh được tải đúng khi đường dẫn hợp lệ
-        background = new Background("path/to/valid/image.jpg", false);
-        assertNotNull(background);
-        Image image = ((ImageView) background.getChildrenUnmodifiable().get(0)).getImage();
-        assertNotNull(image);
+        background = new Background(validImagePath);
+        assertNotNull(background, "Background object should be created.");
+
+        assertFalse(background.getChildrenUnmodifiable().isEmpty(),
+                "Background should contain ImageView when path is valid.");
+
+        ImageView imageView = (ImageView) background.getChildrenUnmodifiable().get(0);
+        assertNotNull(imageView.getImage(), "Image should be loaded.");
+        assertEquals(validImagePath, background.getFilePath(),
+                "File path should match the provided valid image path.");
     }
 
     @Test
     void testInitializeImageBackground_InvalidPath() {
-        // Đảm bảo rằng hình ảnh không được tải khi đường dẫn không hợp lệ
-        background = new Background("path/to/invalid/image.jpg", false);
-        assertNull(background.getChildrenUnmodifiable().get(0));  // Không có ImageView được thêm vào
+        background = new Background(invalidImagePath);
+        assertNotNull(background, "Background object should still be created.");
+        assertTrue(background.getChildrenUnmodifiable().isEmpty(),
+                "No ImageView should be added when path is invalid.");
     }
 
     @Test
-    void testSetVideoSpeed() {
-        // Đảm bảo rằng tốc độ video có thể thay đổi và ảnh hưởng đến việc di chuyển video
-        background = new Background("path/to/valid/video.mp4", true);
-        background.setVideoSpeed(2.0);  // Tăng tốc video gấp đôi
-        assertEquals(2.0, background.getVideoSpeed());  // Kiểm tra tốc độ video mới
+    void testLoadImage_ValidPath() {
+        background = new Background(validImagePath);
+        String newPath = validImagePath;  // Giả sử cùng ảnh, test API
 
-        // Kiểm tra xem timeline có được cập nhật lại với tốc độ mới không
-        assertNotNull(background.getVideoTimeline());
+        background.loadImage(newPath);
+        assertEquals(newPath, background.getFilePath(),
+                "File path should update to new path after loadImage().");
+
+        ImageView imageView = background.getImageView();
+        assertNotNull(imageView.getImage(), "Image should be loaded after calling loadImage().");
     }
 
     @Test
-    void testSetVideoSpeed_InvalidSpeed() {
-        // Đảm bảo rằng tốc độ âm hoặc bằng 0 không hợp lệ
-        background = new Background("path/to/valid/video.mp4", true);
-        background.setVideoSpeed(0);  // Tốc độ không hợp lệ
-        assertEquals(1.0, background.getVideoSpeed());  // Tốc độ phải giữ nguyên là 1.0
+    void testLoadImage_InvalidPath() {
+        background = new Background(validImagePath);
+        background.loadImage(invalidImagePath);
+
+        // Đường dẫn hợp lệ không bị đổi vì ảnh mới lỗi
+        assertEquals(validImagePath, background.getFilePath(),
+                "File path should remain unchanged if new image path is invalid.");
     }
 
     @Test
-    void testLoadVideo_ValidPath() {
-        // Kiểm tra tải lại video khi đường dẫn hợp lệ
-        background = new Background("path/to/valid/video.mp4", true);
-        background.loadVideo("path/to/another/video.mp4");
-
-        MediaView mediaView = (MediaView) background.getChildrenUnmodifiable().get(0);
-        MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
-        assertNotNull(mediaPlayer);
-        assertTrue(mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING);
-    }
-
-    @Test
-    void testLoadVideo_InvalidPath() {
-        // Kiểm tra tải lại video khi đường dẫn không hợp lệ
-        background = new Background("path/to/valid/video.mp4", true);
-        background.loadVideo("path/to/invalid/video.mp4");
-
-        assertNull(background.getChildrenUnmodifiable().get(0));  // Không có MediaView được thêm vào
+    void testGetFilePath() {
+        background = new Background(validImagePath);
+        assertEquals(validImagePath, background.getFilePath(),
+                "getFilePath() should return correct image path.");
     }
 }
