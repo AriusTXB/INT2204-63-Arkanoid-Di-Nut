@@ -20,7 +20,7 @@ public class Brick extends StandardGameObject {
     private final Color color;
 
     /** Brick texture image. */
-    private Image sprite;
+    protected Image sprite;
 
     /** Brick width and height. */
     private static final int WIDTH = 60;
@@ -92,6 +92,7 @@ public class Brick extends StandardGameObject {
         if (c.equals(Color.PINK)) return "pink";
         if (c.equals(Color.YELLOW)) return "yellow";
         if (c.equals(Color.MAGENTA) || c.equals(Color.PURPLE)) return "purple";
+        if (c.equals(Color.GRAY)) return "gray";
         return null;
     }
 

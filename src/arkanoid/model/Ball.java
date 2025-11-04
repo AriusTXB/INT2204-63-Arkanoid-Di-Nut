@@ -167,7 +167,24 @@ public class Ball extends StandardGameObject {
                     setVelY(-getVelY());
                 }
 
-                handler.removeEntity(obj);
+                if (obj instanceof StrongBrick strongBrick) {
+                    strongBrick.takeHit();
+                    if (strongBrick.isDestroyed()) {
+                        handler.removeEntity(obj);
+                        spawnRandomItem(strongBrick);
+                    }
+                } else {
+                    if (obj instanceof HellBrick hellBrick)
+                    {
+                        hellBrick.takeHit();
+                    }
+                    else {
+                        handler.removeEntity(obj);
+                        spawnRandomItem((Brick) obj);
+                    }
+
+                }
+
 
                 SongBox songBox = new SongBox();
                 songBox.playExplode();

@@ -186,6 +186,8 @@ public class Game extends StandardGame {
             case 1 -> 1;
             case 2 -> 2;
             case 3 -> 3;
+            case 4 -> 4;
+            case 5 -> 5;
             default -> 1;
         };
 
