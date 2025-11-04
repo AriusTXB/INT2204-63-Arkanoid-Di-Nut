@@ -16,6 +16,8 @@ public class Menu {
 
     // This method will return the menu scene to ArkanoidRunner
     public void getMenuScene(Stage primaryStage) {
+
+        Background background = new Background("media/img/BG2.png", false);
         // Create buttons for Play and Exit
         Button playButton = new Button("Play");
         Button exitButton = new Button("Exit");
