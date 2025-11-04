@@ -31,14 +31,12 @@ public class Level {
         bricks = new ArrayList<>();
 
         switch (difficulty) {
-            // case 1 -> createEasyLayout();
-            case 1 -> createHellLayout();
+            case 1 -> createEasyLayout();
             case 2 -> createNormalLayout();
             case 3 -> createHardLayout();
             case 4 -> createHellLayout();
             case 5 -> createImpossibleLayout();
-            //default -> createEasyLayout();
-            default -> createHellLayout();
+            default -> createEasyLayout();
         }
     }
 

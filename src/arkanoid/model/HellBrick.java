@@ -85,4 +85,8 @@ public class HellBrick extends StrongBrick {
     public String toString() {
         return String.format("HellBrick[x=%.1f, y=%.1f, hp=%d]", getX(), getY(), getHealth());
     }
+
+    public int getHealth() {
+        return MAX_HEALTH;
+    }
 }
