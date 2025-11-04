@@ -1,67 +1,108 @@
 package arkanoid.view;
 
 import arkanoid.controller.Game;
+import arkanoid.model.SongBox;
+import javafx.animation.ScaleTransition;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import java.io.File;
+import javafx.util.Duration;
 
 public class Menu {
 
-    // Constructor to initialize Menu
+    private final SongBox songBox = new SongBox();
+
+    // Constructor
     public Menu(Stage primaryStage) {
-        // Menu UI setup code, to be used in ArkanoidRunner
         getMenuScene(primaryStage);
     }
 
-    // This method will return the menu scene to ArkanoidRunner
+    // Hiển thị menu
     public void getMenuScene(Stage primaryStage) {
 
+        // Background
         Background background = new Background("media/img/BG2.png");
-        // Create buttons for Play and Exit
-        Font customFont = Font.loadFont(
-                new File("media/font/Pixeboy-z8XGD.ttf").toURI().toString(), 36
-        );
 
-        // Create buttons
+        // Font
+        Font.loadFont(getClass().getResourceAsStream("/font/PIPERLAND.ttf"), 36);
+
+        // Nút
         Button playButton = new Button("Play");
         Button exitButton = new Button("Exit");
 
-        // Apply font and style
-        playButton.setFont(customFont);
-        exitButton.setFont(customFont);
-        playButton.setStyle("-fx-text-fill: black; -fx-background-color: transparent;");
-        exitButton.setStyle("-fx-text-fill: black; -fx-background-color: transparent;");
+        String baseStyle = """
+            -fx-background-color: transparent;
+            -fx-text-fill: #00FFFF;
+            -fx-font-weight: bold;
+            -fx-font-size: 36px;
+            -fx-font-family: 'PIPERLAND';
+            -fx-effect: dropshadow(gaussian, #0044FF, 10, 0.5, 0, 0);
+            -fx-cursor: hand;
+        """;
 
-        // Actions
-        playButton.setOnAction(e -> startGame(primaryStage));
-        exitButton.setOnAction(e -> exitGame());
+        playButton.setStyle(baseStyle);
+        exitButton.setStyle(baseStyle);
 
-        // Layout to hold the buttons
-        VBox buttonLayout = new VBox(20);
+        // Hover + âm thanh
+        addHoverEffect(playButton, baseStyle);
+        addHoverEffect(exitButton, baseStyle);
 
-        StackPane root = new StackPane();
-        root.getChildren().addAll(background.getImageView(), buttonLayout);
+        // Click action
+        playButton.setOnAction(e -> {
+            songBox.playClick();
+            startGame(primaryStage);
+        });
 
-        buttonLayout.getChildren().addAll(playButton, exitButton);
+        exitButton.setOnAction(e -> {
+            songBox.playClick();
+            exitGame();
+        });
+
+        // Layout
+        VBox buttonLayout = new VBox(30, playButton, exitButton);
         buttonLayout.setStyle("-fx-alignment: center;");
 
-        // Create and return the scene
+        StackPane root = new StackPane(background.getImageView(), buttonLayout);
+
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        songBox.loop("menu");
+    }
+
+    private void addHoverEffect(Button button, String baseStyle) {
+        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), button);
+        scaleUp.setToX(1.15);
+        scaleUp.setToY(1.15);
+
+        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(150), button);
+        scaleDown.setToX(1.0);
+        scaleDown.setToY(1.0);
+
+        button.setOnMouseEntered(e -> {
+            songBox.playClick();
+            button.setStyle(baseStyle.replace("#00FFFF", "#FFFFFF"));
+            scaleUp.playFromStart();
+        });
+
+        button.setOnMouseExited(e -> {
+            button.setStyle(baseStyle);
+            scaleDown.playFromStart();
+        });
     }
 
     public void startGame(Stage primaryStage) {
+        songBox.stopAll();
         Game game = new Game(primaryStage);
         game.StartGame();
     }
 
     public void exitGame() {
-        System.exit(0); // Exit the game
+        songBox.stopAll();
+        System.exit(0);
     }
 }

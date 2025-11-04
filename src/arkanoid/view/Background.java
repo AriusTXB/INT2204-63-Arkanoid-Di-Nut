@@ -28,7 +28,7 @@ public class Background extends Region {
 
         imageView.setFitWidth(800);
         imageView.setFitHeight(600);
-        imageView.setPreserveRatio(true);
+        imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
 
         this.setPrefSize(800, 600);

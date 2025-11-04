@@ -5,13 +5,11 @@ import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.HashMap;
 
 /**
- * A class that manages all audio in the Arkanoid game.
- * - Loads sound files from the directory: projectRoot/media/audio/
- * - Uses JavaFX {@link MediaPlayer} for playback
- * - Provides dedicated play methods for each sound effect
+ * Quản lý âm thanh trong Arkanoid.
  */
 public class SongBox {
 
@@ -21,85 +19,92 @@ public class SongBox {
         loadAllSounds();
     }
 
-    /** Loads all required sound files. */
     private void loadAllSounds() {
         loadSound("menu", "media/audio/menu.mp3");
         loadSound("level", "media/audio/level.mp3");
         loadSound("explode", "media/audio/explode.mp3");
         loadSound("gameover", "media/audio/gameover.mp3");
+        loadSound("click", "media/audio/click.wav");
+
+        loadSound("christmas", "media/audio/christmas.mp3");
+        loadSound("tet", "media/audio/tet.mp3");
+        loadSound("national_day", "media/audio/quoc_khanh.mp3");
     }
 
     /**
-     * Utility method to load a sound file with a specific key.
+     * Tải file âm thanh.
      */
     private void loadSound(String key, String path) {
         try {
-            String fullPath = Paths.get(path).toAbsolutePath().toString();
-            File file = new File(fullPath);
-
+            File file = new File(Paths.get(path).toAbsolutePath().toString());
             if (!file.exists()) {
-                System.err.println("Audio file not found: " + fullPath);
                 return;
             }
 
             Media media = new Media(file.toURI().toString());
             MediaPlayer player = new MediaPlayer(media);
-
-            // Set a global volume level for all sounds
             player.setVolume(0.5);
-
             sounds.put(key, player);
-            System.out.println("Loaded sound: " + key);
-
         } catch (Exception e) {
-            System.err.println("Error loading sound: " + key);
             e.printStackTrace();
         }
     }
 
-    public void playMenu() { play("menu"); }
-
+    /** Phát âm thanh chung **/
+    public void playClick() { play("click"); }
+    public void playExplode() { play("explode"); }
+    public void playGameOver() { play("gameover"); }
     public void playLevel() { play("level"); }
 
-    public void playExplode() { play("explode"); }
+    /** Phát âm thanh dựa theo ngày lễ **/
+    public void playSeasonalMusic() {
+        String key = getSeasonalMusicKey();
+        loop(key);
+    }
 
-    public void playGameOver() { play("gameover"); }
+    /** Xác định nhạc tương ứng với ngày**/
+    private String getSeasonalMusicKey() {
+        LocalDate today = LocalDate.now();
+        int day = today.getDayOfMonth();
+        int month = today.getMonthValue();
 
-    /**
-     * Plays a sound associated with the given key.
-     */
+        if (month == 12 && day >= 20 && day <= 26) return "christmas";
+
+        if (month == 9 && day == 2) return "national_day";
+
+        if (month == 2 && day >= 1 && day <= 10) return "tet";
+
+        return "menu";
+    }
+
+    /** Phát âm thanh 1 lần **/
     private void play(String key) {
         MediaPlayer player = sounds.get(key);
         if (player == null) {
-            System.err.println("Sound not loaded: " + key);
             return;
         }
-
-        // Reset to allow immediate replay
         player.stop();
         player.play();
     }
 
-    /**
-     * Loops a background track indefinitely.
-     */
+    /** Lặp nhạc nền **/
     public void loop(String key) {
         MediaPlayer player = sounds.get(key);
-        if (player == null) return;
-
+        if (player == null) {
+            return;
+        }
+        player.stop();
         player.setCycleCount(MediaPlayer.INDEFINITE);
         player.play();
     }
 
-    /**
-     * Stops a specific sound.
-     */
+    /** Dừng nhạc **/
     public void stop(String key) {
         MediaPlayer player = sounds.get(key);
         if (player != null) player.stop();
     }
 
-    /** Stops all currently playing sounds. */
+    /** Dừng tất cả nhạc **/
     public void stopAll() {
         for (MediaPlayer player : sounds.values()) {
             player.stop();

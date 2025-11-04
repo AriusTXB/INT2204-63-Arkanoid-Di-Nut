@@ -94,7 +94,8 @@ public class Game extends StandardGame {
             if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) paddle.stop();
         });
 
-        songBox.loop("level");
+        songBox.playSeasonalMusic();
+
     }
 
     @Override
