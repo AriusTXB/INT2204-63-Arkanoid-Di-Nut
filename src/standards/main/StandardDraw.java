@@ -326,4 +326,9 @@ public abstract class StandardDraw {
   public static final Color VIOLET =  Color(127, 0, 255);
 
   public static final Color BLACK = Color.BLACK;
+
+  public static void image(Image image, double x, double y, double width, double height) {
+      Renderer.drawImage(image, x, y, width, height);
+  }
+
 }

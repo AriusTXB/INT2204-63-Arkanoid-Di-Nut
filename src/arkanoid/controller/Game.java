@@ -1,6 +1,7 @@
 package arkanoid.controller;
 
 import arkanoid.model.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -22,6 +23,7 @@ public class Game extends StandardGame {
     private int difficulty = 1;
     private boolean ballLaunched = false;
     private SongBox songBox;
+    private Image backgroundImage;
 
     private Lives lives;
     private boolean gameOver = false;
@@ -40,6 +42,8 @@ public class Game extends StandardGame {
 
     /** Initializes game logic. */
     public void initGame() {
+        backgroundImage = new Image("file:media/img/BG3.png");
+
         handler = new StandardHandler();
         songBox = new SongBox();
         lives = new Lives(3, 20, 20);
@@ -143,12 +147,11 @@ public class Game extends StandardGame {
     @Override
     public void render() {
         // Background
-        StandardDraw.rect(
+        StandardDraw.image(
+                backgroundImage,
                 0, 0,
                 getGameWidth(),
-                getGameHeight(),
-                Color.BLACK,
-                true
+                getGameHeight()
         );
 
         StandardDraw.Handler(handler);
