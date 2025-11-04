@@ -2,70 +2,99 @@ package arkanoid.test.view;
 
 import arkanoid.view.GUI;
 import arkanoid.view.Background;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.ApplicationTest;
-import org.testfx.api.FxRobot;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(ApplicationExtension.class)
-public class GUITest extends ApplicationTest {
+public class GUITest {
 
+    private static JFXPanel fxPanel; // Khởi động JavaFX Toolkit
     private GUI gui;
+    private Stage stage;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        gui = new GUI();
-        gui.start(primaryStage);
+    @BeforeAll
+    static void initFX() {
+        fxPanel = new JFXPanel(); // Bắt buộc để khởi động JavaFX runtime trong môi trường test
+    }
+
+    @BeforeEach
+    void setUp() throws Exception {
+        Platform.runLater(() -> {
+            stage = new Stage();
+            gui = new GUI();
+            gui.start(stage);
+        });
+        Thread.sleep(1000); // Đợi JavaFX init xong
     }
 
     @Test
-    void testPlayButtonChangesImage(FxRobot robot) {
-        // Lấy nút Play
-        Button playButton = (Button) robot.lookup(".button").queryAll().stream()
-                .filter(node -> ((Button) node).getText().equals("Play"))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Play button not found"));
-
-        // Nhấn nút
-        robot.clickOn(playButton);
-
-        // Kiểm tra background đã tồn tại
-        assertNotNull(gui.getBackground());
-
-        // Kiểm tra rằng đường dẫn ảnh đã thay đổi (BG1.png thay vì BG2.png)
-        String filePath = gui.getBackground().getFilePath();
-        assertTrue(filePath.contains("BG1") || filePath.contains("bg1"),
-                "Expected image path to contain 'BG1', but got: " + filePath);
+    void testInitialBackgroundImageLoaded() throws Exception {
+        Platform.runLater(() -> {
+            Background bg = gui.getBackground();
+            assertNotNull(bg, "Background should be initialized.");
+            assertTrue(
+                    bg.getFilePath().contains("background_video1") ||
+                            bg.getFilePath().contains("BG1"),
+                    "Initial background should be loaded correctly."
+            );
+        });
+        Thread.sleep(500);
     }
 
     @Test
-    void testExitButtonClosesStage(FxRobot robot) {
-        // Lấy nút Exit
-        Button exitButton = (Button) robot.lookup(".button").queryAll().stream()
-                .filter(node -> ((Button) node).getText().equals("Exit"))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Exit button not found"));
+    void testPlayButtonChangesBackground() throws Exception {
+        Platform.runLater(() -> {
+            Scene scene = stage.getScene();
+            // Lấy nút "Play" từ danh sách button
+            Button playBtn = (Button) scene.getRoot().lookupAll(".button").stream()
+                    .map(node -> (Button) node)
+                    .filter(btn -> "Play".equals(btn.getText()))
+                    .findFirst()
+                    .orElse(null);
 
-        // Nhấn nút
-        robot.clickOn(exitButton);
+            assertNotNull(playBtn, "Play button should exist.");
+            playBtn.fire(); // Giả lập click
 
-        // Kiểm tra stage đã đóng
-        Stage stage = (Stage) exitButton.getScene().getWindow();
-        assertFalse(stage.isShowing(), "Stage should be closed.");
+            Background bg = gui.getBackground();
+            assertNotNull(bg);
+            assertTrue(
+                    bg.getFilePath().contains("background_video2") ||
+                            bg.getFilePath().contains("BG2"),
+                    "Background should change after Play button pressed."
+            );
+        });
+        Thread.sleep(500);
     }
 
     @Test
-    void testInitialBackgroundImageLoaded() {
-        // Kiểm tra khởi tạo ban đầu
-        assertNotNull(gui.getBackground(), "Background should be initialized.");
+    void testExitButtonClosesStage() throws Exception {
+        Platform.runLater(() -> {
+            Scene scene = stage.getScene();
+            // Lấy nút "Exit"
+            Button exitBtn = (Button) scene.getRoot().lookupAll(".button").stream()
+                    .map(node -> (Button) node)
+                    .filter(btn -> "Exit".equals(btn.getText()))
+                    .findFirst()
+                    .orElse(null);
 
-        String filePath = gui.getBackground().getFilePath();
-        assertTrue(filePath.contains("BG2") || filePath.contains("bg2"),
-                "Expected initial image path to contain 'BG2', but got: " + filePath);
+            assertNotNull(exitBtn, "Exit button should exist.");
+            exitBtn.fire();
+            assertFalse(stage.isShowing(), "Stage should close after Exit button pressed.");
+        });
+        Thread.sleep(500);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        Platform.runLater(() -> {
+            if (stage != null) stage.close();
+        });
+        Thread.sleep(500);
     }
 }

@@ -26,10 +26,13 @@ public class Background extends Region {
         Image image = new Image(file.toURI().toString());
         imageView = new ImageView(image);
 
+        imageView.setFitWidth(800);
+        imageView.setFitHeight(600);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+
+        this.setPrefSize(800, 600);
         this.getChildren().add(imageView);
-        imageView.setFitWidth(getPrefWidth());
-        imageView.setFitHeight(getPrefHeight());
-        imageView.setPreserveRatio(false);
     }
 
     /** Change background image dynamically */
