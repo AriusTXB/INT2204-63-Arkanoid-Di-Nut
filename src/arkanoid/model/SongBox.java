@@ -74,7 +74,7 @@ public class SongBox {
 
         if (month == 2 && day >= 1 && day <= 10) return "tet";
 
-        return "menu";
+        return "level";
     }
 
     /** Phát âm thanh 1 lần **/
