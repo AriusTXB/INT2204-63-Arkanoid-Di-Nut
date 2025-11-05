@@ -31,10 +31,14 @@ public class Game extends StandardGame {
     private final List<StandardTrail> trailPool = new ArrayList<>();
     private static final int TRAIL_POOL_SIZE = 200;
 
-    public Game(Stage stage) {
+    public Game(Stage stage, int level) {
         super(800, 600, "Arkanoid Game", stage);
-        initGame();
+        this.difficulty = level; // set level trước
+        initGame();              // khởi tạo handler, paddle, balls
+        loadLevel(level);        // load đúng level đã chọn
     }
+
+
 
     public int getDifficulty() {
         return this.difficulty;
@@ -74,7 +78,7 @@ public class Game extends StandardGame {
         handler.addEntity(mainBall);
 
         // Load first level
-        loadLevel(difficulty);
+        //loadLevel(difficulty);
 
         // Keyboard input
         getWindow().getScene().setOnKeyPressed(e -> {
