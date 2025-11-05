@@ -1,15 +1,14 @@
 package arkanoid.controller;
 
+import arkanoid.model.BrickFactory;
 import arkanoid.model.Brick;
-import arkanoid.model.StrongBrick;
-import arkanoid.model.HellBrick;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Đại diện cho một màn chơi (Level) trong game Arkanoid.
- * Sinh layout Brick theo độ khó.
+ * Sử dụng Factory Pattern để sinh Brick theo độ khó.
  */
 public class Level {
 
@@ -40,7 +39,7 @@ public class Level {
         }
     }
 
-    /** Layout dễ: ít gạch, kích thước lớn, khoảng cách thoáng */
+    /** Layout dễ */
     private void createEasyLayout() {
         int cols = 8, rows = 4;
         double brickWidth = 60;
@@ -57,7 +56,7 @@ public class Level {
                 double x = startX + c * (brickWidth + gap);
                 double y = startY + r * (brickHeight + gap);
                 Color color = colors[r % colors.length];
-                bricks.add(new Brick(x, y, color));
+                bricks.add(BrickFactory.createBrick("normal", x, y, color));
             }
         }
     }
@@ -83,13 +82,11 @@ public class Level {
                 double y = startY + r * (brickHeight + gap);
                 Color color = colors[r % colors.length];
 
-                // 4 góc StrongBrick
-                if ((r == 0 && c == 0) || (r == 0 && c == cols - 1) ||
-                        (r == rows - 1 && c == 0) || (r == rows - 1 && c == cols - 1)) {
-                    bricks.add(new StrongBrick(x, y, Color.GRAY));
-                } else {
-                    bricks.add(new Brick(x, y, color));
-                }
+                String type = ((r == 0 && c == 0) || (r == 0 && c == cols - 1) ||
+                        (r == rows - 1 && c == 0) || (r == rows - 1 && c == cols - 1))
+                        ? "strong" : "normal";
+
+                bricks.add(BrickFactory.createBrick(type, x, y, color));
             }
         }
     }
@@ -115,12 +112,8 @@ public class Level {
                 double y = startY + r * (brickHeight + gap);
                 Color color = colors[r % colors.length];
 
-                // So le: hàng chẵn StrongBrick, hàng lẻ Brick
-                if (r % 2 == 0 && c % 2 == 0) {
-                    bricks.add(new StrongBrick(x, y, Color.GRAY));
-                } else {
-                    bricks.add(new Brick(x, y, color));
-                }
+                String type = (r % 2 == 0 && c % 2 == 0) ? "strong" : "normal";
+                bricks.add(BrickFactory.createBrick(type, x, y, color));
             }
         }
     }
@@ -135,17 +128,11 @@ public class Level {
         double startX = (SCREEN_WIDTH - totalWidth) / 2.0;
         double startY = 60;
 
-        Color[] colors = {
-                Color.DARKRED, Color.FIREBRICK, Color.CRIMSON,
-                Color.DARKMAGENTA, Color.DARKVIOLET
-        };
-
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 double x = startX + c * (brickWidth + gap);
                 double y = startY + r * (brickHeight + gap);
-                Color color = colors[(r + c) % colors.length];
-                bricks.add(new StrongBrick(x, y, Color.GRAY));
+                bricks.add(BrickFactory.createBrick("strong", x, y, Color.GRAY));
             }
         }
     }
@@ -160,16 +147,11 @@ public class Level {
         double startX = (SCREEN_WIDTH - totalWidth) / 2.0;
         double startY = 60;
 
-        Color[] colors = {
-                Color.BLACK, Color.DARKRED, Color.MAROON, Color.DARKSLATEGRAY
-        };
-
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 double x = startX + c * (brickWidth + gap);
                 double y = startY + r * (brickHeight + gap);
-                Color color = colors[(r + c) % colors.length];
-                bricks.add(new HellBrick(x, y, Color.BLACK));
+                bricks.add(BrickFactory.createBrick("hell", x, y, Color.BLACK));
             }
         }
     }
